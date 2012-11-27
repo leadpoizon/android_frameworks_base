@@ -6020,6 +6020,12 @@ public final class Settings {
          */
 
         /**
+         * Whether to display the ADB notification.
+         * @hide
+         */
+        public static final String ADB_NOTIFY = "adb_notify";
+
+        /**
          * The hostname for this device
          * @hide
          */
