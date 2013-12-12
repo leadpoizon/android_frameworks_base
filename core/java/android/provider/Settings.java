@@ -3275,6 +3275,12 @@ public final class Settings {
         public static final String BATTERY_SAVER_NOTIFICATION = "battery_saver_notification";
 
         /**
+         * Enable statusbar double tap gesture on to put device to sleep
+         * @hide
+         */
+        public static final String DOUBLE_TAP_SLEEP_GESTURE = "double_tap_sleep_gesture";
+
+        /**
          * Force expanded notifications on all apps that support it.
          * @hide
          */
