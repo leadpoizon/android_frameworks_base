@@ -3636,6 +3636,12 @@ public final class Settings {
         public static final String DOUBLE_TAP_SLEEP_NAVBAR = "double_tap_sleep_navbar";
 
         /**
+         * Whether the notification light will be allowed when in zen mode during downtime
+         * @hide
+         */
+        public static final String ALLOW_LIGHTS = "allow_lights";
+
+        /**
          * IMPORTANT: If you add a new public settings you also have to add it to
          * PUBLIC_SETTINGS below. If the new setting is hidden you have to add
          * it to PRIVATE_SETTINGS below. Also add a validator that can validate
@@ -3695,7 +3701,8 @@ public final class Settings {
             LOCK_TO_APP_ENABLED,
             NOTIFICATION_SOUND,
             STATUS_BAR_BATTERY_STYLE,
-            STATUS_BAR_SHOW_BATTERY_PERCENT
+            STATUS_BAR_SHOW_BATTERY_PERCENT,
+            ALLOW_LIGHTS
         };
 
         /**
