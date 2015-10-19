@@ -2452,6 +2452,12 @@ public final class Settings {
         public static final int SCREEN_BRIGHTNESS_MODE_AUTOMATIC = 1;
 
         /**
+         * Whether long press recents goes to last app
+         * @hide
+         */
+        public static final String RECENTS_LONGPRESS = "recents_longpress";
+
+        /**
          * Control whether the process CPU usage meter should be shown.
          *
          * @deprecated Use {@link Global#SHOW_PROCESSES} instead
