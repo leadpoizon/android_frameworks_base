@@ -2465,6 +2465,12 @@ public final class Settings {
         public static final String RECENTS_LONGPRESS = "recents_longpress";
 
         /**
+         * Whether the left icon on lockscreen is voice or phone
+         * @hide
+         */
+        public static final String LOCKSCREEN_VOICE_SHORTCUT = "lockscreen_voice_shortcut";
+
+        /**
          * Control whether the process CPU usage meter should be shown.
          *
          * @deprecated Use {@link Global#SHOW_PROCESSES} instead
