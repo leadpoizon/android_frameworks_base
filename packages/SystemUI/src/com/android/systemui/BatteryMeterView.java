@@ -17,7 +17,6 @@
 
 package com.android.systemui;
 
-import android.animation.ArgbEvaluator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,11 +25,8 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.DashPathEffect;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
@@ -65,7 +61,8 @@ public class BatteryMeterView extends View implements DemoMode,
     private float mButtonHeightFraction;
     private float mSubpixelSmoothingLeft;
     private float mSubpixelSmoothingRight;
-    private int mIconTint = Color.WHITE;
+
+    private int mBattColor;
 
     public static enum BatteryMeterMode {
         BATTERY_METER_GONE,
@@ -89,12 +86,6 @@ public class BatteryMeterView extends View implements DemoMode,
 
     private BatteryController mBatteryController;
     private boolean mPowerSaveEnabled;
-
-    private int mDarkModeBackgroundColor;
-    private int mDarkModeFillColor;
-
-    private int mLightModeBackgroundColor;
-    private int mLightModeFillColor;
 
     private final Handler mHandler;
 
@@ -321,7 +312,7 @@ public class BatteryMeterView extends View implements DemoMode,
     }
 
     @Override
-    public void onBatteryStyleChanged(int style, int percentMode) {
+    public void onBatteryStyleChanged(int style, int percentMode, int battColor) {
         boolean showInsidePercent = percentMode == BatteryController.PERCENTAGE_MODE_INSIDE;
         BatteryMeterMode meterMode = BatteryMeterMode.BATTERY_METER_ICON_PORTRAIT;
 
@@ -347,7 +338,9 @@ public class BatteryMeterView extends View implements DemoMode,
                 break;
         }
 
+        // do anything directly w/ color here? Maybe try to work it in to getColorForLevel?
         setMode(meterMode);
+        mBattColor = battColor;
         mShowPercent = showInsidePercent;
         invalidateIfVisible();
     }
@@ -408,6 +401,20 @@ public class BatteryMeterView extends View implements DemoMode,
         }
     }
 
+    public int getChargingColor() {
+
+        // If we are in power save mode, always use the normal color.
+        if (mPowerSaveEnabled) {
+            return getResources().getColor(R.color.batterymeter_charge_color);
+        }
+        // Could do something more here, but good enough for now
+        if (mBattColor != 0) {
+            return mBattColor;
+        } else {
+            return getResources().getColor(R.color.batterymeter_charge_color);
+        }
+    }
+
     public int getColorForLevel(int percent) {
 
         // If we are in power save mode, always use the normal color.
@@ -419,40 +426,10 @@ public class BatteryMeterView extends View implements DemoMode,
             thresh = mColors[i];
             color = mColors[i+1];
             if (percent <= thresh) {
-
-                // Respect tinting for "normal" level
-                if (i == mColors.length-2) {
-                    return mIconTint;
-                } else {
-                    return color;
-                }
+                return (mBattColor != 0) ? mBattColor : color;
             }
         }
         return color;
-    }
-
-    public void setDarkIntensity(float darkIntensity) {
-        int backgroundColor = getBackgroundColor(darkIntensity);
-        int fillColor = getFillColor(darkIntensity);
-        mIconTint = fillColor;
-        mFramePaint.setColor(backgroundColor);
-        mBoltPaint.setColor(fillColor);
-        mChargeColor = fillColor;
-        invalidate();
-    }
-
-    private int getBackgroundColor(float darkIntensity) {
-        return getColorForDarkIntensity(
-                darkIntensity, mLightModeBackgroundColor, mDarkModeBackgroundColor);
-    }
-
-    private int getFillColor(float darkIntensity) {
-        return getColorForDarkIntensity(
-                darkIntensity, mLightModeFillColor, mDarkModeFillColor);
-    }
-
-    private int getColorForDarkIntensity(float darkIntensity, int lightColor, int darkColor) {
-        return (int) ArgbEvaluator.getInstance().evaluate(darkIntensity, lightColor, darkColor);
     }
 
     @Override
@@ -546,18 +523,11 @@ public class BatteryMeterView extends View implements DemoMode,
             mWarningTextPaint.setTypeface(font);
             mWarningTextPaint.setTextAlign(Paint.Align.CENTER);
 
-            mChargeColor = getResources().getColor(R.color.batterymeter_charge_color);
+            mChargeColor = getChargingColor();
 
             mBoltPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBoltPaint.setColor(res.getColor(R.color.batterymeter_bolt_color));
             mBoltPoints = loadBoltPoints(res);
-
-        mDarkModeBackgroundColor =
-                context.getColor(R.color.dark_mode_icon_color_dual_tone_background);
-        mDarkModeFillColor = context.getColor(R.color.dark_mode_icon_color_dual_tone_fill);
-        mLightModeBackgroundColor =
-                context.getColor(R.color.light_mode_icon_color_dual_tone_background);
-        mLightModeFillColor = context.getColor(R.color.light_mode_icon_color_dual_tone_fill);
         }
 
         @Override
@@ -618,7 +588,7 @@ public class BatteryMeterView extends View implements DemoMode,
             mFrame.bottom -= mSubpixelSmoothingRight;
 
             // set the battery charging color
-            mBatteryPaint.setColor(tracker.plugged ? mChargeColor : getColorForLevel(level));
+            mBatteryPaint.setColor(tracker.plugged ? getChargingColor() : getColorForLevel(level));
 
             if (level >= FULL) {
                 drawFrac = 1f;
@@ -851,20 +821,13 @@ public class BatteryMeterView extends View implements DemoMode,
             mWarningTextPaint.setTypeface(font);
             mWarningTextPaint.setTextAlign(Paint.Align.CENTER);
 
-            mChargeColor = getResources().getColor(R.color.batterymeter_charge_color);
+            mChargeColor = getChargingColor();
 
             mPathEffect = new DashPathEffect(new float[]{3,2},0);
 
             mBoltPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBoltPaint.setColor(res.getColor(R.color.batterymeter_bolt_color));
             mBoltPoints = loadBoltPoints(res);
-
-        mDarkModeBackgroundColor =
-                context.getColor(R.color.dark_mode_icon_color_dual_tone_background);
-        mDarkModeFillColor = context.getColor(R.color.dark_mode_icon_color_dual_tone_fill);
-        mLightModeBackgroundColor =
-                context.getColor(R.color.light_mode_icon_color_dual_tone_background);
-        mLightModeFillColor = context.getColor(R.color.light_mode_icon_color_dual_tone_fill);
         }
 
         @Override
@@ -962,6 +925,7 @@ public class BatteryMeterView extends View implements DemoMode,
                             mBoltFrame.left + mBoltPoints[0] * mBoltFrame.width(),
                             mBoltFrame.top + mBoltPoints[1] * mBoltFrame.height());
                 }
+                mBoltPaint.setColor(paint.getColor());
                 canvas.drawPath(mBoltPath, mBoltPaint);
 
             } else {

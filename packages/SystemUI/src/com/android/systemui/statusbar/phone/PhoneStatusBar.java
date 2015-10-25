@@ -29,6 +29,7 @@ import android.app.PendingIntent;
 import android.app.StatusBarManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks2;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -840,7 +841,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
                 // noop
             }
             @Override
-            public void onBatteryStyleChanged(int style, int percentMode) {
+            public void onBatteryStyleChanged(int style, int percentMode, int battColor) {
                 // noop
             }
         });
