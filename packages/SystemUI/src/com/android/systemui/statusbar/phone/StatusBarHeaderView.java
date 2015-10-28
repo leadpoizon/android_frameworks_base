@@ -53,8 +53,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.keyguard.KeyguardStatusView;
-import com.android.systemui.BatteryMeterView;
 import com.android.systemui.BatteryLevelTextView;
+import com.android.systemui.BatteryMeterView;
 import com.android.systemui.FontSizeUtils;
 import com.android.systemui.R;
 import com.android.systemui.qs.QSPanel;
@@ -147,8 +147,8 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
     private boolean mShowingDetail;
     private boolean mDetailTransitioning;
     private SettingsObserver mSettingsObserver;
-    private boolean mShowBatteryTextExpanded;
     private boolean mShowWeather;
+    private boolean mShowBatteryTextExpanded;
 
     public StatusBarHeaderView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -830,12 +830,12 @@ public class StatusBarHeaderView extends RelativeLayout implements View.OnClickL
 
             float t3 = Math.max(0, t - 0.7f) / 0.3f;
             batteryLevelAlpha = v1.batteryLevelAlpha * (1 - t3) + v2.batteryLevelAlpha * t3;
-            batteryLevelExpandedAlpha =
-                    v1.batteryLevelExpandedAlpha * (1 - t3) + v2.batteryLevelExpandedAlpha * t3;
             settingsAlpha = v1.settingsAlpha * (1 - t3) + v2.settingsAlpha * t3;
             dateExpandedAlpha = v1.dateExpandedAlpha * (1 - t3) + v2.dateExpandedAlpha * t3;
             dateCollapsedAlpha = v1.dateCollapsedAlpha * (1 - t3) + v2.dateCollapsedAlpha * t3;
             alarmStatusAlpha = v1.alarmStatusAlpha * (1 - t3) + v2.alarmStatusAlpha * t3;
+            batteryLevelExpandedAlpha =
+                    v1.batteryLevelExpandedAlpha * (1 - t3) + v2.batteryLevelExpandedAlpha * t3;
         }
     }
 
