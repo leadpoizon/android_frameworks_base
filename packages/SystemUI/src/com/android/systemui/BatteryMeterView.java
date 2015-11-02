@@ -80,6 +80,12 @@ public class BatteryMeterView extends View implements DemoMode,
     private BatteryController mBatteryController;
     private boolean mPowerSaveEnabled;
 
+    private int mDarkModeBackgroundColor;
+    private int mDarkModeFillColor;
+
+    private int mLightModeBackgroundColor;
+    private int mLightModeFillColor;
+
     protected BatteryMeterMode mMeterMode = null;
 
     protected boolean mAttached;
@@ -88,6 +94,7 @@ public class BatteryMeterView extends View implements DemoMode,
     protected BatteryTracker mDemoTracker = new BatteryTracker();
     protected BatteryTracker mTracker = new BatteryTracker();
     private BatteryMeterDrawable mBatteryMeterDrawable;
+    private int mIconTint = Color.WHITE;
 
     private class BatteryTracker extends BroadcastReceiver {
         public static final int UNKNOWN_LEVEL = -1;
@@ -240,6 +247,13 @@ public class BatteryMeterView extends View implements DemoMode,
                 R.fraction.battery_subpixel_smoothing_left, 1, 1);
         mSubpixelSmoothingRight = context.getResources().getFraction(
                 R.fraction.battery_subpixel_smoothing_right, 1, 1);
+
+        mDarkModeBackgroundColor =
+                context.getColor(R.color.dark_mode_icon_color_dual_tone_background);
+        mDarkModeFillColor = context.getColor(R.color.dark_mode_icon_color_dual_tone_fill);
+        mLightModeBackgroundColor =
+                context.getColor(R.color.light_mode_icon_color_dual_tone_background);
+        mLightModeFillColor = context.getColor(R.color.light_mode_icon_color_dual_tone_fill);
 
         setAnimationsEnabled(true);
     }
@@ -402,10 +416,38 @@ public class BatteryMeterView extends View implements DemoMode,
             thresh = mColors[i];
             color = mColors[i+1];
             if (percent <= thresh) {
-                return (mBattColor != 0) ? mBattColor : color;
+
+                // Respect tinting for "normal" level
+                if (i == mColors.length-2) {
+                    return mIconTint;
+                } else {
+                    return (mBattColor != 0) ? mBattColor : color;
+                }
             }
         }
         return color;
+    }
+
+    public void setDarkIntensity(float darkIntensity) {
+        if (mBatteryMeterDrawable != null) {
+            int backgroundColor = getBackgroundColor(darkIntensity);
+            int fillColor = getFillColor(darkIntensity);
+            mBatteryMeterDrawable.setDarkIntensity(backgroundColor, fillColor);
+        }
+    }
+
+    private int getBackgroundColor(float darkIntensity) {
+        return getColorForDarkIntensity(
+                darkIntensity, mLightModeBackgroundColor, mDarkModeBackgroundColor);
+    }
+
+    private int getFillColor(float darkIntensity) {
+        return getColorForDarkIntensity(
+                darkIntensity, mLightModeFillColor, mDarkModeFillColor);
+    }
+
+    private int getColorForDarkIntensity(float darkIntensity, int lightColor, int darkColor) {
+        return (int) ArgbEvaluator.getInstance().evaluate(darkIntensity, lightColor, darkColor);
     }
 
     @Override
@@ -449,6 +491,7 @@ public class BatteryMeterView extends View implements DemoMode,
         void onDraw(Canvas c, BatteryTracker tracker);
         void onSizeChanged(int w, int h, int oldw, int oldh);
         void onDispose();
+        void setDarkIntensity(int backgroundColor, int fillColor);
     }
 
     protected class NormalBatteryMeterDrawable implements BatteryMeterDrawable {
@@ -707,6 +750,15 @@ public class BatteryMeterView extends View implements DemoMode,
         }
 
         @Override
+        public void setDarkIntensity(int backgroundColor, int fillColor) {
+            mIconTint = fillColor;
+            mFramePaint.setColor(backgroundColor);
+            mBoltPaint.setColor(fillColor);
+            mChargeColor = fillColor;
+            invalidate();
+        }
+
+        @Override
         public void onSizeChanged(int w, int h, int oldw, int oldh) {
             mHeight = h;
             mWidth = w;
@@ -819,6 +871,14 @@ public class BatteryMeterView extends View implements DemoMode,
         @Override
         public void onDispose() {
             mDisposed = true;
+        }
+
+        @Override
+        public void setDarkIntensity(int backgroundColor, int fillColor) {
+            mIconTint = fillColor;
+            mBoltPaint.setColor(fillColor);
+            mChargeColor = fillColor;
+            invalidate();
         }
 
         @Override
