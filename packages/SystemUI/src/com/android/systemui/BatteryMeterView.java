@@ -54,8 +54,6 @@ public class BatteryMeterView extends View implements DemoMode,
     private float mSubpixelSmoothingLeft;
     private float mSubpixelSmoothingRight;
 
-    private int mBattColor;
-
     public enum BatteryMeterMode {
         BATTERY_METER_GONE,
         BATTERY_METER_ICON_PORTRAIT,
@@ -317,7 +315,7 @@ public class BatteryMeterView extends View implements DemoMode,
     }
 
     @Override
-    public void onBatteryStyleChanged(int style, int percentMode, int battColor) {
+    public void onBatteryStyleChanged(int style, int percentMode) {
         boolean showInsidePercent = percentMode == BatteryController.PERCENTAGE_MODE_INSIDE;
         BatteryMeterMode meterMode = BatteryMeterMode.BATTERY_METER_ICON_PORTRAIT;
 
@@ -343,9 +341,7 @@ public class BatteryMeterView extends View implements DemoMode,
                 break;
         }
 
-        // do anything directly w/ color here? Maybe try to work it in to getColorForLevel?
         setMode(meterMode);
-        mBattColor = battColor;
         mShowPercent = showInsidePercent;
         invalidate();
     }
@@ -391,20 +387,6 @@ public class BatteryMeterView extends View implements DemoMode,
         }
     }
 
-    public int getChargingColor() {
-
-        // If we are in power save mode, always use the normal color.
-        if (mPowerSaveEnabled) {
-            return getResources().getColor(R.color.batterymeter_charge_color);
-        }
-        // Could do something more here, but good enough for now
-        if (mBattColor != 0) {
-            return mBattColor;
-        } else {
-            return getResources().getColor(R.color.batterymeter_charge_color);
-        }
-    }
-
     public int getColorForLevel(int percent) {
 
         // If we are in power save mode, always use the normal color.
@@ -421,7 +403,7 @@ public class BatteryMeterView extends View implements DemoMode,
                 if (i == mColors.length-2) {
                     return mIconTint;
                 } else {
-                    return (mBattColor != 0) ? mBattColor : color;
+                    return color;
                 }
             }
         }
@@ -540,7 +522,7 @@ public class BatteryMeterView extends View implements DemoMode,
             mWarningTextPaint.setTypeface(font);
             mWarningTextPaint.setTextAlign(Paint.Align.CENTER);
 
-            mChargeColor = getChargingColor();
+            mChargeColor = getResources().getColor(R.color.batterymeter_charge_color);
 
             mBoltPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBoltPaint.setColor(res.getColor(R.color.batterymeter_bolt_color));
@@ -605,7 +587,7 @@ public class BatteryMeterView extends View implements DemoMode,
             mFrame.bottom -= mSubpixelSmoothingRight;
 
             // set the battery charging color
-            mBatteryPaint.setColor(tracker.plugged ? getChargingColor() : getColorForLevel(level));
+            mBatteryPaint.setColor(tracker.plugged ? mChargeColor : getColorForLevel(level));
 
             if (level >= FULL) {
                 drawFrac = 1f;
@@ -845,7 +827,7 @@ public class BatteryMeterView extends View implements DemoMode,
             mWarningTextPaint.setTypeface(font);
             mWarningTextPaint.setTextAlign(Paint.Align.CENTER);
 
-            mChargeColor = getChargingColor();
+            mChargeColor = getResources().getColor(R.color.batterymeter_charge_color);
 
             mPathEffect = new DashPathEffect(new float[]{3,2},0);
 
@@ -937,7 +919,6 @@ public class BatteryMeterView extends View implements DemoMode,
                 canvas.drawText("?", textX, mTextY, mTextPaint);
 
             } else if (tracker.plugged) {
-                mBoltPaint.setColor(paint.getColor());
                 canvas.drawPath(mBoltPath, mBoltPaint);
             } else {
                 if (level > mCriticalLevel
