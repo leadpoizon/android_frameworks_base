@@ -2483,12 +2483,6 @@ public final class Settings {
         public static final String BATTERY_LOW_NOTIFICATION = "battery_low_notification";
 
         /**
-         * Whether the left icon on lockscreen is voice or phone
-         * @hide
-         */
-        public static final String LOCKSCREEN_VOICE_SHORTCUT = "lockscreen_voice_shortcut";
-
-        /**
          * Whether to show media art on lockscreen
          * @hide
          */
