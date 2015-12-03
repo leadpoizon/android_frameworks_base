@@ -3728,6 +3728,12 @@ public final class Settings {
                 "volume_keys_control_ring_stream";
 
         /**
+         * Boolean value whether to link ringtone and notification volume
+         * @hide
+         */
+        public static final String VOLUME_LINK_NOTIFICATION = "volume_link_notification";
+
+        /**
          * Whether to wake the screen with the volume keys, the value is boolean.
          * @hide
          */
