@@ -98,7 +98,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.ServiceManager;
-import android.os.UserHandle;
 import android.provider.Settings;
 import android.transition.Scene;
 import android.transition.Transition;
@@ -1795,8 +1794,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 }
                 final int rotation = getWindowManager().getDefaultDisplay().getRotation();
                 final Configuration config = getContext().getResources().getConfiguration();
-                final boolean swapKeys = Settings.System.getIntForUser(getContext().getContentResolver(),
-                        Settings.System.SWAP_VOLUME_BUTTONS, 0, UserHandle.USER_CURRENT) == 1;
+                final boolean swapKeys = Settings.System.getInt(getContext().getContentResolver(),
+                        Settings.System.SWAP_VOLUME_BUTTONS, 0) == 1;
 
                 if (swapKeys
                         && (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_180)
