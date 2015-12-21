@@ -4254,7 +4254,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode,
             }
 
             if (hijackRecentsLongPress && (Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.RECENTS_LONGPRESS, 0, UserHandle.USER_CURRENT) == 1)) {
+                Settings.System.RECENTS_LONGPRESS, 1, UserHandle.USER_CURRENT) == 1)) {
                 ActionUtils.switchToLastApp(mContext, mCurrentUserId);
             }
         } catch (RemoteException e) {
